@@ -9,7 +9,7 @@
         <div style="text-align: center">
           <svg-icon icon-class="login-mall" style="width: 56px;height: 56px;color: #409EFF"></svg-icon>
         </div>
-        <h2 class="login-title color-main">mall-admin-web</h2>
+        <h2 class="login-title color-main">shop-admin-web</h2>
         <el-form-item prop="username">
           <el-input name="username"
                     type="text"
@@ -71,7 +71,7 @@
       return {
         loginForm: {
           username: 'admin',
-          password: '123456'
+          password: 'admin123'
         },
         loginRules: {
           username: [{required: true, trigger: 'blur', validator: validateUsername}],
@@ -94,6 +94,8 @@
         this.$refs.loginForm.validate(valid => {
           if (valid) {
             this.loading = true;
+            console.log("登陆成功.....")
+            //登录成功之后重定向到首页
             this.$store.dispatch('Login', this.loginForm).then(() => {
               this.loading = false;
               this.$router.push({path: '/'})

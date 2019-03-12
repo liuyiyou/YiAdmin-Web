@@ -1,10 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-
-Vue.use(Router)
-
 /* Layout */
 import Layout from '../views/layout/Layout'
+
+Vue.use(Router)
 
 /**
  * hidden: true                   if `hidden:true` will not show in the sidebar(default is false)
@@ -33,28 +32,53 @@ export const constantRouterMap = [
     }]
   },
   {
+    path: '/sys',
+    component: Layout,
+    redirect: '/sys/user',
+    name: 'sys',
+    meta: {title: '系统管理'},
+    children: [{
+      path: 'user',
+      name: 'user',
+      component: () => import('@/views/sys/user/index'),
+      meta: {title: '用户列表'}
+    },
+      {
+        path: 'role',
+        name: 'role',
+        component: () => import('@/views/sys/role/index'),
+        meta: {title: '角色列表'}
+      },
+      {
+        path: 'menu',
+        name: 'menu',
+        component: () => import('@/views/sys/menu/index'),
+        meta: {title: '菜单列表'}
+      }]
+  },
+  {
     path: '/pms',
     component: Layout,
     redirect: '/pms/product',
     name: 'pms',
-    meta: {title: '商品', icon: 'product'},
+    meta: {title: '商品'},
     children: [{
       path: 'product',
       name: 'product',
       component: () => import('@/views/pms/product/index'),
-      meta: {title: '商品列表', icon: 'product-list'}
+      meta: {title: '商品列表'}
     },
       {
         path: 'addProduct',
         name: 'addProduct',
         component: () => import('@/views/pms/product/add'),
-        meta: {title: '添加商品', icon: 'product-add'}
+        meta: {title: '添加商品'}
       },
       {
         path: 'updateProduct',
         name: 'updateProduct',
         component: () => import('@/views/pms/product/update'),
-        meta: {title: '修改商品', icon: 'product-add'},
+        meta: {title: '修改商品'},
         hidden: true
       },
       {
@@ -145,7 +169,7 @@ export const constantRouterMap = [
     component: Layout,
     redirect: '/oms/order',
     name: 'oms',
-    meta: {title: '订单', icon: 'order'},
+    meta: {title: '订单'},
     children: [
       {
         path: 'order',
@@ -158,14 +182,14 @@ export const constantRouterMap = [
         name: 'orderDetail',
         component: () => import('@/views/oms/order/orderDetail'),
         meta: {title: '订单详情'},
-        hidden:true
+        hidden: true
       },
       {
         path: 'deliverOrderList',
         name: 'deliverOrderList',
         component: () => import('@/views/oms/order/deliverOrderList'),
         meta: {title: '发货列表'},
-        hidden:true
+        hidden: true
       },
       {
         path: 'orderSetting',
@@ -190,16 +214,16 @@ export const constantRouterMap = [
         name: 'returnApplyDetail',
         component: () => import('@/views/oms/apply/applyDetail'),
         meta: {title: '退货原因详情'},
-        hidden:true
+        hidden: true
       }
     ]
   },
   {
-    path:'/sms',
+    path: '/sms',
     component: Layout,
     redirect: '/sms/coupon',
     name: 'sms',
-    meta: {title: '营销', icon: 'sms'},
+    meta: {title: '营销'},
     children: [
       {
         path: 'flash',
@@ -212,21 +236,21 @@ export const constantRouterMap = [
         name: 'flashSession',
         component: () => import('@/views/sms/flash/sessionList'),
         meta: {title: '秒杀时间段列表'},
-        hidden:true
+        hidden: true
       },
       {
         path: 'selectSession',
         name: 'selectSession',
         component: () => import('@/views/sms/flash/selectSessionList'),
         meta: {title: '秒杀时间段选择'},
-        hidden:true
+        hidden: true
       },
       {
         path: 'flashProductRelation',
         name: 'flashProductRelation',
         component: () => import('@/views/sms/flash/productRelationList'),
         meta: {title: '秒杀商品列表'},
-        hidden:true
+        hidden: true
       },
       {
         path: 'coupon',
@@ -239,21 +263,21 @@ export const constantRouterMap = [
         name: 'addCoupon',
         component: () => import('@/views/sms/coupon/add'),
         meta: {title: '添加优惠券'},
-        hidden:true
+        hidden: true
       },
       {
         path: 'updateCoupon',
         name: 'updateCoupon',
         component: () => import('@/views/sms/coupon/update'),
         meta: {title: '修改优惠券'},
-        hidden:true
+        hidden: true
       },
       {
         path: 'couponHistory',
         name: 'couponHistory',
         component: () => import('@/views/sms/coupon/history'),
         meta: {title: '优惠券领取详情'},
-        hidden:true
+        hidden: true
       },
       {
         path: 'brand',
@@ -290,14 +314,14 @@ export const constantRouterMap = [
         name: 'addHomeAdvertise',
         component: () => import('@/views/sms/advertise/add'),
         meta: {title: '添加广告'},
-        hidden:true
+        hidden: true
       },
       {
         path: 'updateAdvertise',
         name: 'updateHomeAdvertise',
         component: () => import('@/views/sms/advertise/update'),
         meta: {title: '编辑广告'},
-        hidden:true
+        hidden: true
       }
     ]
   },
