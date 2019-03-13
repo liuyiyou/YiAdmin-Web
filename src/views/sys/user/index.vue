@@ -35,6 +35,24 @@
         size="mini">
         添加
       </el-button>
+      <el-select
+        size="small"
+        v-model="operateType" placeholder="批量操作">
+        <el-option
+          v-for="item in operates"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value">
+        </el-option>
+      </el-select>
+      <el-button
+        style="margin-left: 20px"
+        class="search-button"
+        @click="handleBatchOperate()"
+        type="primary"
+        size="small">
+        确定
+      </el-button>
     </el-card>
 
     <div class="table-container">
@@ -46,74 +64,19 @@
                 border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
         <el-table-column label="编号" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+          <template slot-scope="scope">{{scope.row.userId}}</template>
         </el-table-column>
-        <el-table-column label="商品图片" width="120" align="center">
-          <template slot-scope="scope"><img style="height: 80px" :src="scope.row.pic"></template>
+        <el-table-column label="账号" width="100" align="center">
+          <template slot-scope="scope">{{scope.row.loginName}}</template>
         </el-table-column>
-        <el-table-column label="商品名称" align="center">
-          <template slot-scope="scope">
-            <p>{{scope.row.name}}</p>
-            <p>品牌：{{scope.row.brandName}}</p>
-          </template>
+        <el-table-column label="手机号码" width="100" align="center">
+          <template slot-scope="scope">{{scope.row.phonenumber}}</template>
         </el-table-column>
-        <el-table-column label="价格/货号" width="120" align="center">
-          <template slot-scope="scope">
-            <p>价格：￥{{scope.row.price}}</p>
-            <p>货号：{{scope.row.productSn}}</p>
-          </template>
+        <el-table-column label="email" width="100" align="center">
+          <template slot-scope="scope">{{scope.row.email}}</template>
         </el-table-column>
-        <el-table-column label="标签" width="140" align="center">
-          <template slot-scope="scope">
-            <p>上架：
-              <el-switch
-                @change="handlePublishStatusChange(scope.$index, scope.row)"
-                :active-value="1"
-                :inactive-value="0"
-                v-model="scope.row.publishStatus">
-              </el-switch>
-            </p>
-            <p>新品：
-              <el-switch
-                @change="handleNewStatusChange(scope.$index, scope.row)"
-                :active-value="1"
-                :inactive-value="0"
-                v-model="scope.row.newStatus">
-              </el-switch>
-            </p>
-            <p>推荐：
-              <el-switch
-                @change="handleRecommendStatusChange(scope.$index, scope.row)"
-                :active-value="1"
-                :inactive-value="0"
-                v-model="scope.row.recommandStatus">
-              </el-switch>
-            </p>
-          </template>
-        </el-table-column>
-        <el-table-column label="排序" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.sort}}</template>
-        </el-table-column>
-        <el-table-column label="SKU库存" width="100" align="center">
-          <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" @click="handleShowSkuEditDialog(scope.$index, scope.row)" circle></el-button>
-          </template>
-        </el-table-column>
-        <el-table-column label="销量" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.sale}}</template>
-        </el-table-column>
-        <el-table-column label="审核状态" width="100" align="center">
-          <template slot-scope="scope">
-            <p>{{scope.row.verifyStatus | verifyStatusFilter}}</p>
-            <p>
-              <el-button
-                type="text"
-                @click="handleShowVerifyDetail(scope.$index, scope.row)">审核详情
-              </el-button>
-            </p>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="160" align="center">
+
+        <el-table-column label="操作" width="200" align="center">
           <template slot-scope="scope">
             <p>
               <el-button
@@ -123,12 +86,6 @@
               <el-button
                 size="mini"
                 @click="handleUpdateProduct(scope.$index, scope.row)">编辑
-              </el-button>
-            </p>
-            <p>
-              <el-button
-                size="mini"
-                @click="handleShowLog(scope.$index, scope.row)">日志
               </el-button>
               <el-button
                 size="mini"
@@ -140,9 +97,19 @@
         </el-table-column>
       </el-table>
     </div>
+    <div class="pagination-container">
+      <el-pagination
+        background
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        layout="total, sizes,prev, pager, next,jumper"
+        :page-size="listQuery.pageSize"
+        :page-sizes="[5,10,15]"
+        :current-page.sync="listQuery.pageNum"
+        :total="total">
+      </el-pagination>
+    </div>
   </div>
-
-
 
 
 </template>
@@ -174,7 +141,7 @@
         this.listLoading = true;
         list(this.listQuery).then(response => {
           this.listLoading = false;
-          this.list = response.data.list;
+          this.list = response.data.records;
           this.total = response.data.total;
         });
       },

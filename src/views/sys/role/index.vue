@@ -9,7 +9,7 @@
           @click="handleSearchList()"
           type="primary"
           size="small">
-          查询结果
+          查询
         </el-button>
         <el-button
           style="float: right;margin-right: 15px"
@@ -20,9 +20,13 @@
       </div>
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
-          <el-form-item label="输入搜索：">
-            <el-input style="width: 203px" v-model="listQuery.keyword" placeholder="商品名称"></el-input>
+          <el-form-item label="角色：">
+            <el-input style="width: 203px" v-model="listQuery.roleKey" placeholder="角色"></el-input>
           </el-form-item>
+          <el-form-item label="角色名称：">
+            <el-input style="width: 203px" v-model="listQuery.roleName" placeholder="角色名称"></el-input>
+          </el-form-item>
+
         </el-form>
       </div>
     </el-card>
@@ -31,7 +35,7 @@
       <span>数据列表</span>
       <el-button
         class="btn-add"
-        @click=""
+        @click="handleAddRoleForm()"
         size="mini">
         添加
       </el-button>
@@ -45,75 +49,23 @@
                 v-loading="listLoading"
                 border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+        <el-table-column label="编号" align="center">
+          <template slot-scope="scope">{{scope.row.roleId}}</template>
         </el-table-column>
-        <el-table-column label="商品图片" width="120" align="center">
-          <template slot-scope="scope"><img style="height: 80px" :src="scope.row.pic"></template>
+        <el-table-column label="角色" align="center">
+          <template slot-scope="scope">{{scope.row.roleKey}}</template>
         </el-table-column>
-        <el-table-column label="商品名称" align="center">
-          <template slot-scope="scope">
-            <p>{{scope.row.name}}</p>
-            <p>品牌：{{scope.row.brandName}}</p>
-          </template>
+        <el-table-column label="角色名称" align="center">
+          <template slot-scope="scope">{{scope.row.roleName}}</template>
         </el-table-column>
-        <el-table-column label="价格/货号" width="120" align="center">
-          <template slot-scope="scope">
-            <p>价格：￥{{scope.row.price}}</p>
-            <p>货号：{{scope.row.productSn}}</p>
-          </template>
+        <el-table-column label="描述" align="center">
+          <template slot-scope="scope">{{scope.row.remark}}</template>
         </el-table-column>
-        <el-table-column label="标签" width="140" align="center">
-          <template slot-scope="scope">
-            <p>上架：
-              <el-switch
-                @change="handlePublishStatusChange(scope.$index, scope.row)"
-                :active-value="1"
-                :inactive-value="0"
-                v-model="scope.row.publishStatus">
-              </el-switch>
-            </p>
-            <p>新品：
-              <el-switch
-                @change="handleNewStatusChange(scope.$index, scope.row)"
-                :active-value="1"
-                :inactive-value="0"
-                v-model="scope.row.newStatus">
-              </el-switch>
-            </p>
-            <p>推荐：
-              <el-switch
-                @change="handleRecommendStatusChange(scope.$index, scope.row)"
-                :active-value="1"
-                :inactive-value="0"
-                v-model="scope.row.recommandStatus">
-              </el-switch>
-            </p>
-          </template>
+        <el-table-column label="创建时间" align="center">
+          <template slot-scope="scope">{{scope.row.createTime}}</template>
         </el-table-column>
-        <el-table-column label="排序" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.sort}}</template>
-        </el-table-column>
-        <el-table-column label="SKU库存" width="100" align="center">
-          <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" @click="handleShowSkuEditDialog(scope.$index, scope.row)" circle></el-button>
-          </template>
-        </el-table-column>
-        <el-table-column label="销量" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.sale}}</template>
-        </el-table-column>
-        <el-table-column label="审核状态" width="100" align="center">
-          <template slot-scope="scope">
-            <p>{{scope.row.verifyStatus | verifyStatusFilter}}</p>
-            <p>
-              <el-button
-                type="text"
-                @click="handleShowVerifyDetail(scope.$index, scope.row)">审核详情
-              </el-button>
-            </p>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="160" align="center">
+
+        <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <p>
               <el-button
@@ -122,13 +74,7 @@
               </el-button>
               <el-button
                 size="mini"
-                @click="handleUpdateProduct(scope.$index, scope.row)">编辑
-              </el-button>
-            </p>
-            <p>
-              <el-button
-                size="mini"
-                @click="handleShowLog(scope.$index, scope.row)">日志
+                @click="handleUpdateRoleForm(scope.$index, scope.row)">编辑
               </el-button>
               <el-button
                 size="mini"
@@ -140,29 +86,84 @@
         </el-table-column>
       </el-table>
     </div>
+    <div class="pagination-container">
+      <el-pagination
+        background
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        layout="total, sizes,prev, pager, next,jumper"
+        :page-size="listQuery.pageSize"
+        :page-sizes="[5,10,15]"
+        :current-page.sync="listQuery.pageNum"
+        :total="total">
+      </el-pagination>
+    </div>
+
+
+    <el-dialog title="添加角色" :visible.sync="selectDialogVisible" width="80%">
+      <el-form :model="role" size="small" label-width="140px">
+        <el-form-item label="角色：">
+          <el-input v-model="role.roleKey" class="input-width" placeholder="角色"></el-input>
+        </el-form-item>
+        <el-form-item label="角色名称：">
+          <el-input v-model="role.roleName" class="input-width" placeholder="角色名称"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述：">
+          <el-input v-model="role.remark" class="input-width" placeholder="角色描述"></el-input>
+        </el-form-item>
+      </el-form>
+      <div style="clear: both;"></div>
+      <div slot="footer">
+        <el-button size="small" @click="selectDialogVisible = false">取 消</el-button>
+        <el-button size="small" type="primary" @click="handleAddRole()">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="修改角色" :visible.sync="updateDialogVisible" width="80%">
+      <el-form :model="role" size="small" label-width="140px">
+        <el-form-item label="角色：">
+          <el-input v-model="role.roleKey" class="input-width"></el-input>
+        </el-form-item>
+        <el-form-item label="角色名称：">
+          <el-input v-model="role.roleName" class="input-width"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述：">
+          <el-input v-model="role.remark" class="input-width"></el-input>
+        </el-form-item>
+      </el-form>
+      <div style="clear: both;"></div>
+      <div slot="footer">
+        <el-button size="small" @click="updateDialogVisible = false">取 消</el-button>
+        <el-button size="small" type="primary" @click="handleEditRole()">确 定</el-button>
+      </div>
+    </el-dialog>
+
+
   </div>
-
-
 
 
 </template>
 
 <script>
-  import {list} from '@/api/user'
+  import {_delete, add, edit, get, list} from '@/api/role'
 
   const defaultListQuery = {
-    keyword: null,
+    roleKey: null,
+    roleName: null,
     pageNum: 1,
-    pageSize: 5,
+    pageSize: 20,
   };
   export default {
-    name: "productList",
+    name: "roleList",
     data() {
       return {
-        listQuery: defaultListQuery,
+        listQuery: Object.assign({}, defaultListQuery),
         list: null,
         total: null,
         listLoading: true,
+        selectDialogVisible: false,
+        updateDialogVisible: false,
+        role: {},
       }
     },
     created() {
@@ -174,7 +175,7 @@
         this.listLoading = true;
         list(this.listQuery).then(response => {
           this.listLoading = false;
-          this.list = response.data.list;
+          this.list = response.data.records;
           this.total = response.data.total;
         });
       },
@@ -182,13 +183,23 @@
         this.listQuery.pageNum = 1;
         this.getList();
       },
+      //当前页翻页
       handleCurrentChange(val) {
         this.listQuery.pageNum = val;
         this.getList();
       },
+      //每页val条触发
+      handleSizeChange(val) {
+        this.listQuery.pageNum = 1;
+        this.listQuery.pageSize = val;
+        this.getList();
+      },
+      handleSelectionChange(val) {
+        this.multipleSelection = val;
+      },
       handleResetSearch() {
-        this.selectProductCateValue = [];
-        this.listQuery = defaultListQuery;
+        this.listQuery = Object.assign({}, defaultListQuery);
+        this.getList();
       },
       handleDelete(index, row) {
         this.$confirm('是否要进行删除操作?', '提示', {
@@ -196,11 +207,54 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          let ids = [];
-          ids.push(row.id);
-          this.updateDeleteStatus(1, ids);
+          _delete(row.roleId).then(response => {
+            this.$message({
+              message: '删除成功！',
+              type: 'success',
+              duration: 1000
+            });
+            this.getList();
+          });
         });
-      }
+      },
+
+      //添加角色
+      handleAddRoleForm() {
+        console.log("添加角色....")
+        this.selectDialogVisible = true;
+      },
+      //添加角色
+      handleAddRole() {
+        //添加操作
+        add(this.role).then(response => {
+          this.selectDialogVisible = false;
+          this.$message({
+            message: '添加成功！',
+            type: 'success',
+            duration: 1000
+          });
+          this.getList();
+        });
+      },
+      //修改角色表单
+      handleUpdateRoleForm(index, row) {
+        this.updateDialogVisible = true;
+        get(row.roleId).then(response => {
+          this.role = response.data;
+        });
+      },
+      handleEditRole() {
+        edit(this.role).then(response => {
+          this.$message({
+            message: '添加成功！',
+            type: 'success',
+            duration: 1000
+          });
+          this.updateDialogVisible = false;
+          this.getList();
+        });
+      },
+
     }
   }
 </script>
