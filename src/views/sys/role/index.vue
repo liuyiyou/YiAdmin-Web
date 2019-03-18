@@ -70,7 +70,7 @@
             <p>
               <el-button
                 size="mini"
-                @click="handleShowProduct(scope.$index, scope.row)">查看
+                @click="handleShowRoleForm(scope.$index, scope.row)">查看
               </el-button>
               <el-button
                 size="mini"
@@ -100,7 +100,7 @@
     </div>
 
 
-    <el-dialog title="添加角色" :visible.sync="selectDialogVisible" width="80%">
+    <el-dialog title="添加角色" :visible.sync="addDialogVisible" width="80%">
       <el-form :model="role" size="small" label-width="140px">
         <el-form-item label="角色：">
           <el-input v-model="role.roleKey" class="input-width" placeholder="角色"></el-input>
@@ -114,7 +114,7 @@
       </el-form>
       <div style="clear: both;"></div>
       <div slot="footer">
-        <el-button size="small" @click="selectDialogVisible = false">取 消</el-button>
+        <el-button size="small" @click="addDialogVisible = false">取 消</el-button>
         <el-button size="small" type="primary" @click="handleAddRole()">确 定</el-button>
       </div>
     </el-dialog>
@@ -135,6 +135,24 @@
       <div slot="footer">
         <el-button size="small" @click="updateDialogVisible = false">取 消</el-button>
         <el-button size="small" type="primary" @click="handleEditRole()">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog title="查看角色" :visible.sync="viewDialogVisible" width="80%">
+      <el-form :model="role" size="small" label-width="140px">
+        <el-form-item label="角色：">
+          <el-input v-model="role.roleKey" class="input-width"></el-input>
+        </el-form-item>
+        <el-form-item label="角色名称：">
+          <el-input v-model="role.roleName" class="input-width"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述：">
+          <el-input v-model="role.remark" class="input-width"></el-input>
+        </el-form-item>
+      </el-form>
+      <div style="clear: both;"></div>
+      <div slot="footer">
+        <el-button size="small" @click="viewDialogVisible = false">取 消</el-button>
       </div>
     </el-dialog>
 
@@ -161,8 +179,9 @@
         list: null,
         total: null,
         listLoading: true,
-        selectDialogVisible: false,
+        addDialogVisible: false,
         updateDialogVisible: false,
+        viewDialogVisible:false,
         role: {},
       }
     },
@@ -221,13 +240,14 @@
       //添加角色
       handleAddRoleForm() {
         console.log("添加角色....")
-        this.selectDialogVisible = true;
+        this.role = {};
+        this.addDialogVisible = true;
       },
       //添加角色
       handleAddRole() {
         //添加操作
         add(this.role).then(response => {
-          this.selectDialogVisible = false;
+          this.addDialogVisible = false;
           this.$message({
             message: '添加成功！',
             type: 'success',
@@ -243,10 +263,19 @@
           this.role = response.data;
         });
       },
+
+      //查看角色表单
+      handleShowRoleForm(index, row) {
+        this.viewDialogVisible = true;
+        get(row.roleId).then(response => {
+          this.role = response.data;
+        });
+      },
+
       handleEditRole() {
         edit(this.role).then(response => {
           this.$message({
-            message: '添加成功！',
+            message: '修改成功！',
             type: 'success',
             duration: 1000
           });
