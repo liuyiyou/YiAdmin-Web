@@ -1,12 +1,11 @@
 import request from '@/utils/request'
 
-// export function list(params) {
-//   return request({
-//     url: '/api/system/user',
-//     method: 'post',
-//     params
-//   });
-// }
+export function get(id) {
+  return request({
+    url: '/api/system/user/' + id,
+    method: 'get',
+  });
+}
 
 
 export function list(data) {
@@ -16,3 +15,5 @@ export function list(data) {
     data
   });
 }
+
+

@@ -21,7 +21,7 @@
       <div style="margin-top: 15px">
         <el-form :inline="true" :model="listQuery" size="small" label-width="140px">
           <el-form-item label="输入搜索：">
-            <el-input style="width: 203px" v-model="listQuery.keyword" placeholder="商品名称"></el-input>
+            <el-input style="width: 203px" v-model="listQuery.keyword" placeholder="账号"></el-input>
           </el-form-item>
         </el-form>
       </div>
@@ -63,34 +63,36 @@
                 v-loading="listLoading"
                 border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="100" align="center">
+        <el-table-column label="编号" align="center">
           <template slot-scope="scope">{{scope.row.userId}}</template>
         </el-table-column>
-        <el-table-column label="账号" width="100" align="center">
+        <el-table-column label="账号" align="center">
           <template slot-scope="scope">{{scope.row.loginName}}</template>
         </el-table-column>
-        <el-table-column label="手机号码" width="100" align="center">
+        <el-table-column label="手机号码" align="center">
           <template slot-scope="scope">{{scope.row.phonenumber}}</template>
         </el-table-column>
-        <el-table-column label="email" width="100" align="center">
+        <el-table-column label="email" align="center">
           <template slot-scope="scope">{{scope.row.email}}</template>
         </el-table-column>
-
-        <el-table-column label="操作" width="200" align="center">
+        <el-table-column label="创建时间" align="center">
+          <template slot-scope="scope">{{scope.row.createTime}}</template>
+        </el-table-column>
+        <el-table-column label="操作"  align="center">
           <template slot-scope="scope">
             <p>
               <el-button
                 size="mini"
-                @click="handleShowProduct(scope.$index, scope.row)">查看
+                @click="view(scope.$index, scope.row)">查看
               </el-button>
               <el-button
                 size="mini"
-                @click="handleUpdateProduct(scope.$index, scope.row)">编辑
+                @click="edit(scope.$index, scope.row)">编辑
               </el-button>
               <el-button
                 size="mini"
                 type="danger"
-                @click="handleDelete(scope.$index, scope.row)">删除
+                @click="delete(scope.$index, scope.row)">删除
               </el-button>
             </p>
           </template>
@@ -120,13 +122,13 @@
   const defaultListQuery = {
     keyword: null,
     pageNum: 1,
-    pageSize: 5,
+    pageSize: 20,
   };
   export default {
-    name: "productList",
+    name: "userList",
     data() {
       return {
-        listQuery: defaultListQuery,
+        listQuery: Object.assign({}, defaultListQuery),
         list: null,
         total: null,
         listLoading: true,
@@ -149,25 +151,25 @@
         this.listQuery.pageNum = 1;
         this.getList();
       },
+      //当前页翻页
       handleCurrentChange(val) {
         this.listQuery.pageNum = val;
         this.getList();
       },
-      handleResetSearch() {
-        this.selectProductCateValue = [];
-        this.listQuery = defaultListQuery;
+      //每页val条触发
+      handleSizeChange(val) {
+        this.listQuery.pageNum = 1;
+        this.listQuery.pageSize = val;
+        this.getList();
       },
-      handleDelete(index, row) {
-        this.$confirm('是否要进行删除操作?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          let ids = [];
-          ids.push(row.id);
-          this.updateDeleteStatus(1, ids);
-        });
-      }
+      handleSelectionChange(val) {
+        this.multipleSelection = val;
+      },
+      handleResetSearch() {
+        this.listQuery = Object.assign({}, defaultListQuery);
+        this.getList();
+      },
+
     }
   }
 </script>

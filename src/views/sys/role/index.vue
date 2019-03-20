@@ -45,7 +45,6 @@
       <el-table ref="productTable"
                 :data="list"
                 style="width: 100%"
-                @selection-change="handleSelectionChange"
                 v-loading="listLoading"
                 border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
@@ -86,77 +85,46 @@
         </el-table-column>
       </el-table>
     </div>
+
     <div class="pagination-container">
-      <el-pagination
-        background
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        layout="total, sizes,prev, pager, next,jumper"
-        :page-size="listQuery.pageSize"
-        :page-sizes="[5,10,15]"
-        :current-page.sync="listQuery.pageNum"
-        :total="total">
-      </el-pagination>
+      <pagination v-show="total>0"
+                  :total="total"
+                  :page.sync="listQuery.pageNum"
+                  :limit.sync="listQuery.pageSize"
+                  @pagination="getList"/>
     </div>
 
-
-    <el-dialog title="添加角色" :visible.sync="addDialogVisible" width="80%">
-      <el-form :model="role" size="small" label-width="140px">
-        <el-form-item label="角色：">
-          <el-input v-model="role.roleKey" class="input-width" placeholder="角色"></el-input>
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+      <el-form ref="dataForm" :rules="rules" :model="role" label-position="left" label-width="100px" size="mini">
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="role.roleKey" clearable/>
         </el-form-item>
-        <el-form-item label="角色名称：">
-          <el-input v-model="role.roleName" class="input-width" placeholder="角色名称"></el-input>
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="role.roleName" clearable/>
         </el-form-item>
-        <el-form-item label="角色描述：">
-          <el-input v-model="role.remark" class="input-width" placeholder="角色描述"></el-input>
+        <el-form-item label="描述" prop="remark">
+          <el-input v-model="role.remark" clearable/>
         </el-form-item>
-      </el-form>
-      <div style="clear: both;"></div>
-      <div slot="footer">
-        <el-button size="small" @click="addDialogVisible = false">取 消</el-button>
-        <el-button size="small" type="primary" @click="handleAddRole()">确 定</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog title="修改角色" :visible.sync="updateDialogVisible" width="80%">
-      <el-form :model="role" size="small" label-width="140px">
-        <el-form-item label="角色：">
-          <el-input v-model="role.roleKey" class="input-width"></el-input>
-        </el-form-item>
-        <el-form-item label="角色名称：">
-          <el-input v-model="role.roleName" class="input-width"></el-input>
-        </el-form-item>
-        <el-form-item label="角色描述：">
-          <el-input v-model="role.remark" class="input-width"></el-input>
+        <el-form-item label="权限">
+          <el-tree
+            ref="roleTree"
+            :data="rolesData"
+            show-checkbox
+            node-key="id"
+            :default-expanded-keys="[1]"
+            :default-checked-keys="checkedKeys"
+            :props="defaultProps">
+          </el-tree>
         </el-form-item>
       </el-form>
-      <div style="clear: both;"></div>
-      <div slot="footer">
-        <el-button size="small" @click="updateDialogVisible = false">取 消</el-button>
-        <el-button size="small" type="primary" @click="handleEditRole()">确 定</el-button>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取消</el-button>
+        <el-button v-if="dialogStatus=== 'view'" hidden></el-button>
+        <el-button v-if="dialogStatus != 'view'" type="primary"
+                   @click="dialogStatus==='create'?handleAddRole():handleEditRole()">确定
+        </el-button>
       </div>
     </el-dialog>
-
-    <el-dialog title="查看角色" :visible.sync="viewDialogVisible" width="80%">
-      <el-form :model="role" size="small" label-width="140px">
-        <el-form-item label="角色：">
-          <el-input v-model="role.roleKey" class="input-width"></el-input>
-        </el-form-item>
-        <el-form-item label="角色名称：">
-          <el-input v-model="role.roleName" class="input-width"></el-input>
-        </el-form-item>
-        <el-form-item label="角色描述：">
-          <el-input v-model="role.remark" class="input-width"></el-input>
-        </el-form-item>
-      </el-form>
-      <div style="clear: both;"></div>
-      <div slot="footer">
-        <el-button size="small" @click="viewDialogVisible = false">取 消</el-button>
-      </div>
-    </el-dialog>
-
-
   </div>
 
 
@@ -164,6 +132,8 @@
 
 <script>
   import {_delete, add, edit, get, list} from '@/api/role'
+  import {menuTreeData, roleMenuTreeData} from '@/api/menus'
+  import Pagination from '@/components/Pagination'
 
   const defaultListQuery = {
     roleKey: null,
@@ -171,18 +141,43 @@
     pageNum: 1,
     pageSize: 20,
   };
+
   export default {
     name: "roleList",
+    components: {Pagination},
     data() {
       return {
+
+        //查询
         listQuery: Object.assign({}, defaultListQuery),
         list: null,
-        total: null,
+        total: 0,
         listLoading: true,
-        addDialogVisible: false,
-        updateDialogVisible: false,
-        viewDialogVisible:false,
+
+        //角色对象
         role: {},
+
+        //新增、编辑、查看弹窗
+        dialogFormVisible: false,
+        dialogStatus: '',
+        textMap: {
+          update: '编辑角色',
+          create: '新增角色',
+          view: "查看角色",
+        },
+
+
+        //权限树
+        rolesData: [],
+        checkedKeys: [],
+        defaultProps: {
+          children: 'childrens',
+          label: 'name'
+        },
+
+        rules: {
+          roleName: [{required: true, message: '请输入角色名称', trigger: 'change'}],
+        },
       }
     },
     created() {
@@ -201,20 +196,6 @@
       handleSearchList() {
         this.listQuery.pageNum = 1;
         this.getList();
-      },
-      //当前页翻页
-      handleCurrentChange(val) {
-        this.listQuery.pageNum = val;
-        this.getList();
-      },
-      //每页val条触发
-      handleSizeChange(val) {
-        this.listQuery.pageNum = 1;
-        this.listQuery.pageSize = val;
-        this.getList();
-      },
-      handleSelectionChange(val) {
-        this.multipleSelection = val;
       },
       handleResetSearch() {
         this.listQuery = Object.assign({}, defaultListQuery);
@@ -241,11 +222,17 @@
       handleAddRoleForm() {
         console.log("添加角色....")
         this.role = {};
-        this.addDialogVisible = true;
+        this.dialogStatus = 'create';
+        this.dialogFormVisible = true;
+        this.checkedKeys = [];
+        this.getMenuTreeData();
       },
       //添加角色
       handleAddRole() {
         //添加操作
+        const _checkedKeys = this.$refs['roleTree'].getCheckedKeys();
+        const _halfCheckedKeys = this.$refs['roleTree'].getHalfCheckedKeys();
+        this.role.menuIds = _checkedKeys.concat(_halfCheckedKeys);
         add(this.role).then(response => {
           this.addDialogVisible = false;
           this.$message({
@@ -258,30 +245,107 @@
       },
       //修改角色表单
       handleUpdateRoleForm(index, row) {
-        this.updateDialogVisible = true;
+        this.dialogStatus = 'update';
+        this.dialogFormVisible = true;
         get(row.roleId).then(response => {
           this.role = response.data;
         });
+        this.checkedKeys = [];
+        this.getRoleMenuTreeData(row.roleId);
       },
 
       //查看角色表单
       handleShowRoleForm(index, row) {
-        this.viewDialogVisible = true;
+        this.dialogStatus = 'view';
+        this.dialogFormVisible = true;
         get(row.roleId).then(response => {
           this.role = response.data;
         });
+        this.getRoleMenuTreeData(row.roleId);
       },
 
       handleEditRole() {
+        const _checkedKeys = this.$refs['roleTree'].getCheckedKeys();
+        const _halfCheckedKeys = this.$refs['roleTree'].getHalfCheckedKeys();
+        this.role.menuIds = _checkedKeys.concat(_halfCheckedKeys);
         edit(this.role).then(response => {
           this.$message({
             message: '修改成功！',
             type: 'success',
             duration: 1000
           });
-          this.updateDialogVisible = false;
           this.getList();
         });
+        this.dialogFormVisible = false;
+      },
+
+
+      formatDataToTree(arr) {
+        let tree = [];
+        let mappedArr = {};
+        let arrElem;
+        let checkedKeys = [];
+        let mappedElem;
+        let pidArray = [];
+
+        for (let i = 0, len = arr.length; i < len; i++) {
+          arrElem = arr[i];
+          mappedArr[arrElem.id] = arrElem;
+          mappedArr[arrElem.id]['childrens'] = [];
+          pidArray.push(arrElem.pid);
+        }
+
+        for (let id in mappedArr) {
+          if (mappedArr.hasOwnProperty(id)) {
+            mappedElem = mappedArr[id];
+
+            if (mappedElem.checked && pidArray.indexOf(mappedElem.id) < 0) {
+              checkedKeys.push(mappedElem.id);
+            }
+
+            if (mappedElem.pid) {
+              mappedArr[mappedElem['pid']]['childrens'].push(mappedElem);
+            }
+            else {
+              tree.push(mappedElem);
+            }
+          }
+        }
+
+        return {
+          tree: tree,
+          checkedKeys: checkedKeys
+        };
+      },
+      getRoleMenuTreeData(roleId) {
+        this.listLoading = true;
+        roleMenuTreeData(roleId).then(response => {
+          this.loadMenuTreeSuccess(response);
+        }).catch((e) => {
+          this.$message.error('网络繁忙,请重试(' + e + ')');
+          this.listLoading = false;
+        })
+      },
+      getMenuTreeData() {
+        this.listLoading = true;
+        menuTreeData().then(response => {
+          this.loadMenuTreeSuccess(response);
+        }).catch((e) => {
+          this.$message.error('网络繁忙,请重试(' + e + ')');
+          this.listLoading = false;
+        })
+      },
+      loadMenuTreeSuccess(response) {
+        this.listLoading = false;
+        console.info(response);
+        if (response.success) {
+          let _treeData = this.formatDataToTree(response.data);
+          this.rolesData = _treeData.tree;
+          this.checkedKeys = [];
+          this.checkedKeys = _treeData.checkedKeys;
+        } else {
+          this.$message.error(response.msg);
+        }
       },
 
     }
