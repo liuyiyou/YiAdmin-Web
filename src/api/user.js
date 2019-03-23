@@ -16,4 +16,12 @@ export function list(data) {
   });
 }
 
+export function add(data) {
+  return request({
+    url: '/api/system/user/add',
+    method: 'post',
+    data
+  });
+}
+
 

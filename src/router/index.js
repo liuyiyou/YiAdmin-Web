@@ -44,6 +44,13 @@ export const constantRouterMap = [
       meta: {title: '用户列表'}
     },
       {
+        path: 'addUser',
+        name: 'addUser',
+        component: () => import('@/views/sys/user/add'),
+        meta: {title: '添加用户'},
+        hidden: true
+      },
+      {
         path: 'role',
         name: 'role',
         component: () => import('@/views/sys/role/index'),

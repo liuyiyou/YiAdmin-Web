@@ -64,9 +64,8 @@
           <template slot-scope="scope">{{scope.row.createTime}}</template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center">
+        <el-table-column label="操作" align="center" width="200">
           <template slot-scope="scope">
-            <p>
               <el-button
                 size="mini"
                 @click="handleShowRoleForm(scope.$index, scope.row)">查看
@@ -80,7 +79,6 @@
                 type="danger"
                 @click="handleDelete(scope.$index, scope.row)">删除
               </el-button>
-            </p>
           </template>
         </el-table-column>
       </el-table>
@@ -96,7 +94,7 @@
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="role" label-position="left" label-width="100px" size="mini">
-        <el-form-item label="角色名称" prop="roleName">
+        <el-form-item label="角色" prop="roleKey">
           <el-input v-model="role.roleKey" clearable/>
         </el-form-item>
         <el-form-item label="角色名称" prop="roleName">
@@ -220,7 +218,6 @@
 
       //添加角色
       handleAddRoleForm() {
-        console.log("添加角色....")
         this.role = {};
         this.dialogStatus = 'create';
         this.dialogFormVisible = true;
@@ -234,7 +231,6 @@
         const _halfCheckedKeys = this.$refs['roleTree'].getHalfCheckedKeys();
         this.role.menuIds = _checkedKeys.concat(_halfCheckedKeys);
         add(this.role).then(response => {
-          this.addDialogVisible = false;
           this.$message({
             message: '添加成功！',
             type: 'success',
@@ -337,7 +333,6 @@
       },
       loadMenuTreeSuccess(response) {
         this.listLoading = false;
-        console.info(response);
         if (response.success) {
           let _treeData = this.formatDataToTree(response.data);
           this.rolesData = _treeData.tree;

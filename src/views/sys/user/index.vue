@@ -31,20 +31,10 @@
       <span>数据列表</span>
       <el-button
         class="btn-add"
-        @click=""
+        @click="handleAddUser()"
         size="mini">
         添加
       </el-button>
-      <el-select
-        size="small"
-        v-model="operateType" placeholder="批量操作">
-        <el-option
-          v-for="item in operates"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value">
-        </el-option>
-      </el-select>
       <el-button
         style="margin-left: 20px"
         class="search-button"
@@ -59,7 +49,6 @@
       <el-table ref="productTable"
                 :data="list"
                 style="width: 100%"
-                @selection-change="handleSelectionChange"
                 v-loading="listLoading"
                 border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
@@ -78,7 +67,7 @@
         <el-table-column label="创建时间" align="center">
           <template slot-scope="scope">{{scope.row.createTime}}</template>
         </el-table-column>
-        <el-table-column label="操作"  align="center">
+        <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <p>
               <el-button
@@ -100,16 +89,11 @@
       </el-table>
     </div>
     <div class="pagination-container">
-      <el-pagination
-        background
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        layout="total, sizes,prev, pager, next,jumper"
-        :page-size="listQuery.pageSize"
-        :page-sizes="[5,10,15]"
-        :current-page.sync="listQuery.pageNum"
-        :total="total">
-      </el-pagination>
+      <pagination v-show="total>0"
+                  :total="total"
+                  :page.sync="listQuery.pageNum"
+                  :limit.sync="listQuery.pageSize"
+                  @pagination="getList"/>
     </div>
   </div>
 
@@ -118,6 +102,8 @@
 
 <script>
   import {list} from '@/api/user'
+  import Pagination from '@/components/Pagination'
+
 
   const defaultListQuery = {
     keyword: null,
@@ -126,11 +112,12 @@
   };
   export default {
     name: "userList",
+    components: {Pagination},
     data() {
       return {
         listQuery: Object.assign({}, defaultListQuery),
         list: null,
-        total: null,
+        total: 0,
         listLoading: true,
       }
     },
@@ -151,23 +138,12 @@
         this.listQuery.pageNum = 1;
         this.getList();
       },
-      //当前页翻页
-      handleCurrentChange(val) {
-        this.listQuery.pageNum = val;
-        this.getList();
-      },
-      //每页val条触发
-      handleSizeChange(val) {
-        this.listQuery.pageNum = 1;
-        this.listQuery.pageSize = val;
-        this.getList();
-      },
-      handleSelectionChange(val) {
-        this.multipleSelection = val;
-      },
       handleResetSearch() {
         this.listQuery = Object.assign({}, defaultListQuery);
         this.getList();
+      },
+      handleAddUser() {
+        this.$router.push({path: '/sys/addUser'});
       },
 
     }
