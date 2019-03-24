@@ -27,3 +27,45 @@ export function validatAlphabets(str) {
   return reg.test(str)
 }
 
+
+/**
+ * validate email
+ * @param email
+ * @returns {boolean}
+ */
+export function validateEmail(email) {
+  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(email);
+}
+
+/**
+ * 验证手机号码
+ * @param mobile
+ * @returns {boolean}
+ */
+export function validateMobile(str) {
+  const reg = /^1[0-9]{10}$/;
+  return reg.test(str);
+}
+
+export function validatePositiveInteger(str) {
+  const reg = /^[1-9]\d*$/;
+  return reg.test(str);
+}
+// 整数
+export function validateInteger(str) {
+  const reg = /^-?\d+$/;
+  return reg.test(str);
+}
+// 金额
+export function validatePice(str) {
+  const reg =/^((0)|([1-9][0-9]*)|(([0]\.\d{1,2}|[1-9][0-9]*\.\d{1,2})))$/;;
+  return reg.test(str);
+}
+// 中文
+export function validateChinese(str) {
+  const reg = /^[\u4e00-\u9fa5]+$/;
+  return reg.test(str);
+}
+
+

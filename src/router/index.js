@@ -61,6 +61,12 @@ export const constantRouterMap = [
         name: 'menu',
         component: () => import('@/views/sys/menu/index'),
         meta: {title: '菜单列表'}
+      },
+      {
+        path: 'dept',
+        name: 'dept',
+        component: () => import('@/views/sys/dept/treeTable'),
+        meta: {title: '部门列表'}
       }]
   },
   {
