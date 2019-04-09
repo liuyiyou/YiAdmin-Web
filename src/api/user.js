@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function get(id) {
   return request({
-    url: '/api/system/user/' + id,
+    url: '/api/admin/system/user/' + id,
     method: 'get',
   });
 }
@@ -10,7 +10,7 @@ export function get(id) {
 
 export function list(data) {
   return request({
-    url: '/api/system/user',
+    url: '/api/admin/system/user',
     method: 'post',
     data
   });
@@ -18,7 +18,7 @@ export function list(data) {
 
 export function add(data) {
   return request({
-    url: '/api/system/user/add',
+    url: '/api/admin/system/user/add',
     method: 'post',
     data
   });

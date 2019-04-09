@@ -3,7 +3,7 @@ import request from '@/utils/request'
 
 export function get(id) {
   return request({
-    url: '/api/system/role/' + id,
+    url: '/api/admin/system/role/' + id,
     method: 'get',
   });
 }
@@ -11,7 +11,7 @@ export function get(id) {
 
 export function list(data) {
   return request({
-    url: '/api/system/role',
+    url: '/api/admin/system/role',
     method: 'post',
     data
   });
@@ -20,7 +20,7 @@ export function list(data) {
 
 export function add(data) {
   return request({
-    url: '/api/system/role/add',
+    url: '/api/admin/system/role/add',
     method: 'post',
     data
   });
@@ -29,7 +29,7 @@ export function add(data) {
 
 export function edit(data) {
   return request({
-    url: '/api/system/role/edit',
+    url: '/api/admin/system/role/edit',
     method: 'put',
     data
   });
@@ -38,7 +38,7 @@ export function edit(data) {
 
 export function _delete(id) {
   return request({
-    url: '/api/system/role/' + id,
+    url: '/api/admin/system/role/' + id,
     method: 'delete'
   });
 }

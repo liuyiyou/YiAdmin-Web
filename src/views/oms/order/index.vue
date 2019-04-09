@@ -76,20 +76,17 @@
                 @selection-change="handleSelectionChange"
                 v-loading="listLoading" border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
-        <el-table-column label="编号" width="80" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
-        </el-table-column>
         <el-table-column label="订单编号" width="180" align="center">
-          <template slot-scope="scope">{{scope.row.orderSn}}</template>
+          <template slot-scope="scope">{{scope.row.orderId}}</template>
         </el-table-column>
         <el-table-column label="提交时间" width="180" align="center">
           <template slot-scope="scope">{{scope.row.createTime | formatCreateTime}}</template>
         </el-table-column>
         <el-table-column label="用户账号" align="center">
-          <template slot-scope="scope">{{scope.row.memberUsername}}</template>
+          <template slot-scope="scope">{{scope.row.consignee}}</template>
         </el-table-column>
         <el-table-column label="订单金额" width="120" align="center">
-          <template slot-scope="scope">￥{{scope.row.totalAmount}}</template>
+          <template slot-scope="scope">￥{{scope.row.totalPrice}}</template>
         </el-table-column>
         <el-table-column label="支付方式" width="120" align="center">
           <template slot-scope="scope">{{scope.row.payType | formatPayType}}</template>
@@ -179,13 +176,13 @@
   </div>
 </template>
 <script>
-  import {fetchList,closeOrder,deleteOrder} from '@/api/order'
+  import {list,fetchList,closeOrder,deleteOrder} from '@/api/order'
   import {formatDate} from '@/utils/date';
   import LogisticsDialog from '@/views/oms/order/components/logisticsDialog';
   const defaultListQuery = {
     pageNum: 1,
     pageSize: 10,
-    orderSn: null,
+    orderId: null,
     receiverKeyword: null,
     status: null,
     orderType: null,
@@ -211,7 +208,7 @@
         statusOptions: [
           {
             label: '待付款',
-            value: 0
+            value: 1
           },
           {
             label: '待发货',
@@ -319,7 +316,7 @@
         this.multipleSelection = val;
       },
       handleViewOrder(index, row){
-        this.$router.push({path:'/oms/orderDetail',query:{id:row.id}})
+        this.$router.push({path:'/oms/orderDetail',query:{id:row.orderId}})
       },
       handleCloseOrder(index, row){
         this.closeOrder.dialogVisible=true;
@@ -413,9 +410,9 @@
       },
       getList() {
         this.listLoading = true;
-        fetchList(this.listQuery).then(response => {
+        list(this.listQuery).then(response => {
           this.listLoading = false;
-          this.list = response.data.list;
+          this.list = response.data.records;
           this.total = response.data.total;
         });
       },

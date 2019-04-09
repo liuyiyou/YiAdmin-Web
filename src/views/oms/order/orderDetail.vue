@@ -51,7 +51,7 @@
           <el-col :span="4" class="table-cell-title">订单类型</el-col>
         </el-row>
         <el-row>
-          <el-col :span="4" class="table-cell">{{order.orderSn}}</el-col>
+          <el-col :span="4" class="table-cell">{{order.orderId}}</el-col>
           <el-col :span="4" class="table-cell">暂无</el-col>
           <el-col :span="4" class="table-cell">{{order.memberUsername}}</el-col>
           <el-col :span="4" class="table-cell">{{order.payType | formatPayType}}</el-col>
@@ -96,8 +96,8 @@
           <el-col :span="6" class="table-cell-title">收货地址</el-col>
         </el-row>
         <el-row>
-          <el-col :span="6" class="table-cell">{{order.receiverName}}</el-col>
-          <el-col :span="6" class="table-cell">{{order.receiverPhone}}</el-col>
+          <el-col :span="6" class="table-cell">{{order.consignee}}</el-col>
+          <el-col :span="6" class="table-cell">{{order.consignPhone}}</el-col>
           <el-col :span="6" class="table-cell">{{order.receiverPostCode}}</el-col>
           <el-col :span="6" class="table-cell">{{order | formatAddress}}</el-col>
         </el-row>
@@ -108,23 +108,22 @@
       </div>
       <el-table
         ref="orderItemTable"
-        :data="order.orderItemList"
+        :data="order.prods"
         style="width: 100%;margin-top: 20px" border>
         <el-table-column label="商品图片" width="120" align="center">
           <template slot-scope="scope">
-            <img :src="scope.row.productPic" style="height: 80px">
+            <img :src="scope.row.album" style="height: 80px">
           </template>
         </el-table-column>
         <el-table-column label="商品名称" align="center">
           <template slot-scope="scope">
-            <p>{{scope.row.productName}}</p>
+            <p>{{scope.row.prodName}}</p>
             <p>品牌：{{scope.row.productBrand}}</p>
           </template>
         </el-table-column>
-        <el-table-column label="价格/货号" width="120" align="center">
+        <el-table-column label="价格" width="120" align="center">
           <template slot-scope="scope">
-            <p>价格：￥{{scope.row.productPrice}}</p>
-            <p>货号：{{scope.row.productSn}}</p>
+            价格：￥{{scope.row.realPrice}}
           </template>
         </el-table-column>
         <el-table-column label="属性" width="120" align="center">
@@ -134,12 +133,12 @@
         </el-table-column>
         <el-table-column label="数量" width="120" align="center">
           <template slot-scope="scope">
-            {{scope.row.productQuantity}}
+            {{scope.row.prodNum}}
           </template>
         </el-table-column>
         <el-table-column label="小计" width="120" align="center">
           <template slot-scope="scope">
-            ￥{{scope.row.productPrice*scope.row.productQuantity}}
+            ￥{{scope.row.realPrice*scope.row.prodNum}}
           </template>
         </el-table-column>
       </el-table>
@@ -407,8 +406,10 @@
       },
       formatPayType(value) {
         if (value === 1) {
-          return '支付宝';
+          return '线下付款';
         } else if (value === 2) {
+          return '支付宝';
+        } else if (value === 4) {
           return '微信';
         } else {
           return '未支付';
@@ -439,13 +440,13 @@
       },
       formatStatus(value) {
         if (value === 1) {
-          return '待发货';
+          return '待支付';
         } else if (value === 2) {
-          return '已发货';
+          return '待发货';
         } else if (value === 3) {
-          return '已完成';
+          return '已发货';
         } else if (value === 4) {
-          return '已关闭';
+          return '已完成';
         } else if (value === 5) {
           return '无效订单';
         } else {
@@ -540,6 +541,7 @@
             });
             getOrderDetail(this.id).then(response => {
               this.order = response.data;
+              console.info(this.order);
             });
           });
         });

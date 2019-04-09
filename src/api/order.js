@@ -1,11 +1,21 @@
 import request from '@/utils/request'
-export function fetchList(params) {
+
+
+export function list(data) {
   return request({
-    url:'/order/list',
-    method:'get',
-    params:params
-  })
+    url: '/api/oms/order/admin-list',
+    method: 'post',
+    data
+  });
 }
+
+// export function fetchList(params) {
+//   return request({
+//     url:'/order/list',
+//     method:'get',
+//     params:params
+//   })
+// }
 
 export function closeOrder(params) {
   return request({
@@ -33,7 +43,7 @@ export function deliveryOrder(data) {
 
 export function getOrderDetail(id) {
   return request({
-    url:'/order/'+id,
+    url:'/api/oms/order/admin/'+id,
     method:'get'
   });
 }
