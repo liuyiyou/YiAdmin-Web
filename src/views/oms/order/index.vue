@@ -89,13 +89,13 @@
           <template slot-scope="scope">￥{{scope.row.totalPrice}}</template>
         </el-table-column>
         <el-table-column label="支付方式" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.payType | formatPayType}}</template>
+          <template slot-scope="scope">{{scope.row.statusName}}</template>
         </el-table-column>
         <el-table-column label="订单来源" width="120" align="center">
           <template slot-scope="scope">{{scope.row.sourceType | formatSourceType}}</template>
         </el-table-column>
         <el-table-column label="订单状态" width="120" align="center">
-          <template slot-scope="scope">{{scope.row.status | formatStatus}}</template>
+          <template slot-scope="scope">{{scope.row.statusName}}</template>
         </el-table-column>
         <el-table-column label="操作" width="200" align="center">
           <template slot-scope="scope">
@@ -211,20 +211,20 @@
             value: 1
           },
           {
-            label: '待发货',
-            value: 1
-          },
-          {
-            label: '已发货',
+            label: '已支付待发货',
             value: 2
           },
           {
-            label: '已完成',
+            label: '已发货',
             value: 3
           },
           {
-            label: '已关闭',
+            label: '已完成',
             value: 4
+          },
+          {
+            label: '已关闭',
+            value: 5
           }
         ],
         orderTypeOptions: [
@@ -272,14 +272,6 @@
         let date = new Date(time);
         return formatDate(date, 'yyyy-MM-dd hh:mm:ss')
       },
-      formatPayType(value) {
-        if (value === 1) {
-          return '支付宝';
-        } else if (value === 2) {
-          return '微信';
-        } else {
-          return '未支付';
-        }
       },
       formatSourceType(value) {
         if (value === 1) {
@@ -288,22 +280,6 @@
           return 'PC订单';
         }
       },
-      formatStatus(value) {
-        if (value === 1) {
-          return '待发货';
-        } else if (value === 2) {
-          return '已发货';
-        } else if (value === 3) {
-          return '已完成';
-        } else if (value === 4) {
-          return '已关闭';
-        } else if (value === 5) {
-          return '无效订单';
-        } else {
-          return '待付款';
-        }
-      },
-    },
     methods: {
       handleResetSearch() {
         this.listQuery = Object.assign({}, defaultListQuery);

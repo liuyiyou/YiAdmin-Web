@@ -3,9 +3,9 @@
     <div>
       <el-steps :active="formatStepStatus(order.status)" finish-status="success" align-center>
         <el-step title="提交订单" :description="formatTime(order.createTime)"></el-step>
-        <el-step title="支付订单" :description="formatTime(order.paymentTime)"></el-step>
-        <el-step title="平台发货" :description="formatTime(order.deliveryTime)"></el-step>
-        <el-step title="确认收货" :description="formatTime(order.receiveTime)"></el-step>
+        <el-step title="支付订单" :description="formatTime(order.payTime)"></el-step>
+        <el-step title="平台发货" :description="formatTime(order.sendTime)"></el-step>
+        <el-step title="确认收货" :description="formatTime(order.doneTime)"></el-step>
         <el-step title="完成评价" :description="formatTime(order.commentTime)"></el-step>
       </el-steps>
     </div>
@@ -53,7 +53,7 @@
         <el-row>
           <el-col :span="4" class="table-cell">{{order.orderId}}</el-col>
           <el-col :span="4" class="table-cell">暂无</el-col>
-          <el-col :span="4" class="table-cell">{{order.memberUsername}}</el-col>
+          <el-col :span="4" class="table-cell">{{order.uaccount}}</el-col>
           <el-col :span="4" class="table-cell">{{order.payType | formatPayType}}</el-col>
           <el-col :span="4" class="table-cell">{{order.sourceType | formatSourceType}}</el-col>
           <el-col :span="4" class="table-cell">{{order.orderType | formatOrderType}}</el-col>
@@ -430,13 +430,8 @@
         }
       },
       formatAddress(order) {
-        let str = order.receiverProvince;
-        if (order.receiverCity != null) {
-          str += "  " + order.receiverCity;
-        }
-        str += "  " + order.receiverRegion;
-        str += "  " + order.receiverDetailAddress;
-        return str;
+        let addr = JSON.parse(order.consignAddr);
+        return addr.prov +" " + addr.city +' ' + addr.country + ' ' + addr.addr;
       },
       formatStatus(value) {
         if (value === 1) {

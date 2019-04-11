@@ -39,16 +39,16 @@
                 border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
         <el-table-column label="编号" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+          <template slot-scope="scope">{{scope.row.brandId}}</template>
         </el-table-column>
         <el-table-column label="品牌名称" align="center">
-          <template slot-scope="scope">{{scope.row.name}}</template>
+          <template slot-scope="scope">{{scope.row.brandNameCn}}</template>
         </el-table-column>
         <el-table-column label="品牌首字母" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.firstLetter}}</template>
+          <template slot-scope="scope">{{scope.row.brandFirstChar}}</template>
         </el-table-column>
-        <el-table-column label="排序" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.sort}}</template>
+        <el-table-column label="描述" width="100" align="center">
+          <template slot-scope="scope">{{scope.row.brandDescp}}</template>
         </el-table-column>
         <el-table-column label="品牌制造商" width="100" align="center">
           <template slot-scope="scope">
@@ -172,17 +172,15 @@
         this.listLoading = true;
         fetchList(this.listQuery).then(response => {
           this.listLoading = false;
-          this.list = response.data.list;
+          this.list = response.data.records;
           this.total = response.data.total;
-          this.totalPage = response.data.totalPage;
-          this.pageSize = response.data.pageSize;
         });
       },
       handleSelectionChange(val) {
         this.multipleSelection = val;
       },
       handleUpdate(index, row) {
-        this.$router.push({path: '/pms/updateBrand', query: {id: row.id}})
+        this.$router.push({path: '/pms/updateBrand', query: {id: row.brandId}})
       },
       handleDelete(index, row) {
         this.$confirm('是否要删除该品牌', '提示', {
