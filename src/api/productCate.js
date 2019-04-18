@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 export function fetchList(parentId,params) {
   return request({
-    url:'/productCategory/list/'+parentId,
+    url:'/api/base/category/list/'+parentId,
     method:'get',
     params:params
   })
@@ -23,7 +23,7 @@ export function createProductCate(data) {
 
 export function updateProductCate(id,data) {
   return request({
-    url:'/productCategory/update/'+id,
+    url:'/api/base/category/update/'+id,
     method:'post',
     data:data
   })
@@ -31,7 +31,7 @@ export function updateProductCate(id,data) {
 
 export function getProductCate(id) {
   return request({
-    url:'/productCategory/'+id,
+    url:'/api/base/category/'+id,
     method:'get',
   })
 }
@@ -54,7 +54,7 @@ export function updateNavStatus(data) {
 
 export function fetchListWithChildren() {
   return request({
-    url:'/productCategory/list/withChildren',
+    url:'/api/base/category/tree',
     method:'get'
   })
 }

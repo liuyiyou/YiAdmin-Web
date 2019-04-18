@@ -7,8 +7,8 @@
           :options="productCateOptions">
         </el-cascader>
       </el-form-item>
-      <el-form-item label="商品名称：" prop="name">
-        <el-input v-model="value.name"></el-input>
+      <el-form-item label="商品名称：" prop="prodName">
+        <el-input v-model="value.prodName"></el-input>
       </el-form-item>
       <el-form-item label="副标题：" prop="subTitle">
         <el-input v-model="value.subTitle"></el-input>
@@ -89,7 +89,7 @@
             {min: 2, max: 140, message: '长度在 2 到 140 个字符', trigger: 'blur'}
           ],
           subTitle: [{required: true, message: '请输入商品副标题', trigger: 'blur'}],
-          productCategoryId: [{required: true, message: '请选择商品分类', trigger: 'blur'}],
+         // productCategoryId: [{required: true, message: '请选择商品分类', trigger: 'blur'}],
           brandId: [{required: true, message: '请选择商品品牌', trigger: 'blur'}],
           description: [{required: true, message: '请输入商品介绍', trigger: 'blur'}],
           requiredProp: [{required: true, message: '该项为必填项', trigger: 'blur'}]
@@ -114,9 +114,10 @@
         this.handleEditCreated();
       },
       selectProductCateValue: function (newValue) {
+        console.log("newValue:"+ newValue)
         if (newValue != null && newValue.length === 2) {
           this.value.productCategoryId = newValue[1];
-          this.value.productCategoryName= this.getCateNameById(this.value.productCategoryId);
+          this.value.prmediumoductCategoryName= this.getCateNameById(this.value.productCategoryId);
         } else {
           this.value.productCategoryId = null;
           this.value.productCategoryName=null;
@@ -124,7 +125,6 @@
       }
     },
     methods: {
-      //处理编辑逻辑
       handleEditCreated(){
         if(this.value.productCategoryId!=null){
           this.selectProductCateValue.push(this.value.cateParentId);
@@ -134,25 +134,15 @@
       },
       getProductCateList() {
         fetchListWithChildren().then(response => {
-          let list = response.data;
-          this.productCateOptions = [];
-          for (let i = 0; i < list.length; i++) {
-            let children = [];
-            if (list[i].children != null && list[i].children.length > 0) {
-              for (let j = 0; j < list[i].children.length; j++) {
-                children.push({label: list[i].children[j].name, value: list[i].children[j].id});
-              }
-            }
-            this.productCateOptions.push({label: list[i].name, value: list[i].id, children: children});
-          }
+          this.productCateOptions = response.data;
         });
       },
       getBrandList() {
         fetchBrandList({pageNum: 1, pageSize: 100}).then(response => {
           this.brandOptions = [];
-          let brandList = response.data.list;
+          let brandList = response.data.records;
           for (let i = 0; i < brandList.length; i++) {
-            this.brandOptions.push({label: brandList[i].name, value: brandList[i].id});
+            this.brandOptions.push({label: brandList[i].brandName, value: brandList[i].brandId});
           }
         });
       },

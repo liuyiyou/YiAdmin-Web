@@ -5,24 +5,21 @@
              ref="productCateFrom"
              label-width="150px">
       <el-form-item label="分类名称：" prop="name">
-        <el-input v-model="productCate.name"></el-input>
+        <el-input v-model="productCate.cataName"></el-input>
       </el-form-item>
       <el-form-item label="上级分类：">
         <el-select v-model="productCate.parentId"
                    placeholder="请选择分类">
           <el-option
             v-for="item in selectProductCateList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id">
+            :key="item.cataId"
+            :label="item.cataName"
+            :value="item.cataId">
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="数量单位：">
-        <el-input v-model="productCate.productUnit"></el-input>
-      </el-form-item>
       <el-form-item label="排序：">
-        <el-input v-model="productCate.sort"></el-input>
+        <el-input v-model="productCate.cataWeight"></el-input>
       </el-form-item>
       <el-form-item label="是否显示：">
         <el-radio-group v-model="productCate.showStatus">
@@ -53,11 +50,8 @@
       <el-form-item>
         <el-button size="small" type="primary" @click="handleAddFilterAttr()">新增</el-button>
       </el-form-item>
-      <el-form-item label="关键词：">
-        <el-input v-model="productCate.keywords"></el-input>
-      </el-form-item>
       <el-form-item label="分类描述：">
-        <el-input type="textarea" :autosize="true" v-model="productCate.description"></el-input>
+        <el-input type="textarea" :autosize="true" v-model="productCate.cataDesc"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit('productCateFrom')">提交</el-button>
@@ -77,12 +71,12 @@
     description: '',
     icon: '',
     keywords: '',
-    name: '',
+    cataName: '',
     navStatus: 0,
     parentId: 0,
     productUnit: '',
     showStatus: 0,
-    sort: 0,
+    cataWeight: 0,
     productAttributeIdList: []
   };
   export default {
@@ -135,7 +129,7 @@
     methods: {
       getSelectProductCateList() {
         fetchList(0, {pageSize: 100, pageNum: 1}).then(response => {
-          this.selectProductCateList = response.data.list;
+          this.selectProductCateList = response.data.records;
           this.selectProductCateList.unshift({id: 0, name: '无上级分类'});
         });
       },

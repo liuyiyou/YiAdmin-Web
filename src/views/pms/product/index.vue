@@ -85,14 +85,14 @@
                 border>
         <el-table-column type="selection" width="60" align="center"></el-table-column>
         <el-table-column label="编号" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+          <template slot-scope="scope">{{scope.row.prodId}}</template>
         </el-table-column>
         <el-table-column label="商品图片" width="120" align="center">
-          <template slot-scope="scope"><img style="height: 80px" :src="scope.row.pic"></template>
+          <template slot-scope="scope"><img style="height: 80px" :src="getImageUrl(scope.row.album)"></template>
         </el-table-column>
         <el-table-column label="商品名称" align="center">
           <template slot-scope="scope">
-            <p>{{scope.row.name}}</p>
+            <p>{{scope.row.prodName}}</p>
             <p>品牌：{{scope.row.brandName}}</p>
           </template>
         </el-table-column>
@@ -129,9 +129,6 @@
               </el-switch>
             </p>
           </template>
-        </el-table-column>
-        <el-table-column label="排序" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.sort}}</template>
         </el-table-column>
         <el-table-column label="SKU库存" width="100" align="center">
           <template slot-scope="scope">
@@ -283,11 +280,12 @@
   import {fetchList as fetchProductAttrList} from '@/api/productAttr'
   import {fetchList as fetchBrandList} from '@/api/brand'
   import {fetchListWithChildren} from '@/api/productCate'
+  import {getFullImageUrl} from "@/utils/index"
 
   const defaultListQuery = {
     keyword: null,
     pageNum: 1,
-    pageSize: 5,
+    pageSize: 10,
     publishStatus: null,
     verifyStatus: null,
     productSn: null,
@@ -391,6 +389,9 @@
       }
     },
     methods: {
+      getImageUrl(url) {
+        return getFullImageUrl(url)
+      },
       getProductSkuSp(row, index) {
         if (index === 0) {
           return row.sp1;
@@ -404,7 +405,7 @@
         this.listLoading = true;
         fetchList(this.listQuery).then(response => {
           this.listLoading = false;
-          this.list = response.data.list;
+          this.list = response.data.records;
           this.total = response.data.total;
         });
       },
@@ -425,10 +426,10 @@
             let children = [];
             if (list[i].children != null && list[i].children.length > 0) {
               for (let j = 0; j < list[i].children.length; j++) {
-                children.push({label: list[i].children[j].name, value: list[i].children[j].id});
+                children.push({label: list[i].children[j].cataName, value: list[i].children[j].cateId});
               }
             }
-            this.productCateOptions.push({label: list[i].name, value: list[i].id, children: children});
+            this.productCateOptions.push({label: list[i].cataName, value: list[i].cateId, children: children});
           }
         });
       },
@@ -580,7 +581,7 @@
         });
       },
       handleUpdateProduct(index,row){
-        this.$router.push({path:'/pms/updateProduct',query:{id:row.id}});
+        this.$router.push({path:'/pms/updateProduct',query:{id:row.prodId}});
       },
       handleShowProduct(index,row){
         console.log("handleShowProduct",row);

@@ -1,5 +1,24 @@
 <template>
   <div class="app-container">
+    <el-card class="filter-container" shadow="never">
+      <div>
+        <i class="el-icon-search"></i>
+        <span>筛选搜索</span>
+        <el-button
+          style="float: right"
+          @click="getList()"
+          type="primary"
+          size="small">
+          查询结果
+        </el-button>
+        <el-button
+          style="float: right;margin-right: 15px"
+          @click="handleResetSearch()"
+          size="small">
+          重置
+        </el-button>
+      </div>
+    </el-card>
     <el-card class="operate-container" shadow="never">
       <i class="el-icon-tickets" style="margin-top: 5px"></i>
       <span style="margin-top: 5px">数据列表</span>
@@ -12,23 +31,17 @@
     </el-card>
     <div class="table-container">
       <el-table ref="productCateTable"
-                style="width: 100%"
+                style="width: 100%" fetchList
                 :data="list"
                 v-loading="listLoading" border>
         <el-table-column label="编号" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.id}}</template>
+          <template slot-scope="scope">{{scope.row.cataId}}</template>
         </el-table-column>
         <el-table-column label="分类名称" align="center">
-          <template slot-scope="scope">{{scope.row.name}}</template>
+          <template slot-scope="scope">{{scope.row.cataName}}</template>
         </el-table-column>
         <el-table-column label="级别" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.level | levelFilter}}</template>
-        </el-table-column>
-        <el-table-column label="商品数量" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.productCount }}</template>
-        </el-table-column>
-        <el-table-column label="数量单位" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.productUnit }}</template>
+          <template slot-scope="scope">{{scope.row.cateType | levelFilter}}</template>
         </el-table-column>
         <el-table-column label="导航栏" width="100" align="center">
           <template slot-scope="scope">
@@ -51,18 +64,14 @@
           </template>
         </el-table-column>
         <el-table-column label="排序" width="100" align="center">
-          <template slot-scope="scope">{{scope.row.sort }}</template>
+          <template slot-scope="scope">{{scope.row.cataWeight }}</template>
         </el-table-column>
         <el-table-column label="设置" width="200" align="center">
           <template slot-scope="scope">
             <el-button
               size="mini"
-              :disabled="scope.row.level | disableNextLevel"
+              :disabled="scope.row.cataType | disableNextLevel"
               @click="handleShowNextLevel(scope.$index, scope.row)">查看下级
-            </el-button>
-            <el-button
-              size="mini"
-              @click="handleTransferProduct(scope.$index, scope.row)">转移商品
             </el-button>
           </template>
         </el-table-column>
@@ -97,7 +106,18 @@
 </template>
 
 <script>
-  import {fetchList,deleteProductCate,updateShowStatus,updateNavStatus} from '@/api/productCate'
+  import {deleteProductCate, fetchList, updateNavStatus, updateShowStatus} from '@/api/productCate'
+
+  const defaultListQuery = {
+    list: null,
+    total: null,
+    listLoading: true,
+    listQuery: {
+      pageNum: 1,
+      pageSize: 10
+    },
+    parentId: 0
+  };
 
   export default {
     name: "productCateList",
@@ -108,7 +128,7 @@
         listLoading: true,
         listQuery: {
           pageNum: 1,
-          pageSize: 5
+          pageSize: 10
         },
         parentId: 0
       }
@@ -124,7 +144,12 @@
       }
     },
     methods: {
-      resetParentId(){
+
+      handleResetSearch() {
+        this.listQuery = Object.assign({}, defaultListQuery);
+      },
+
+      resetParentId() {
         if (this.$route.query.parentId != null) {
           this.parentId = this.$route.query.parentId;
         } else {
@@ -138,7 +163,7 @@
         this.listLoading = true;
         fetchList(this.parentId, this.listQuery).then(response => {
           this.listLoading = false;
-          this.list = response.data.list;
+          this.list = response.data.records;
           this.total = response.data.total;
         });
       },
@@ -153,11 +178,11 @@
       },
       handleNavStatusChange(index, row) {
         let data = new URLSearchParams();
-        let ids=[];
+        let ids = [];
         ids.push(row.id)
-        data.append('ids',ids);
-        data.append('navStatus',row.navStatus);
-        updateNavStatus(data).then(response=>{
+        data.append('ids', ids);
+        data.append('navStatus', row.navStatus);
+        updateNavStatus(data).then(response => {
           this.$message({
             message: '修改成功',
             type: 'success',
@@ -167,11 +192,11 @@
       },
       handleShowStatusChange(index, row) {
         let data = new URLSearchParams();
-        let ids=[];
+        let ids = [];
         ids.push(row.id)
-        data.append('ids',ids);
-        data.append('showStatus',row.showStatus);
-        updateShowStatus(data).then(response=>{
+        data.append('ids', ids);
+        data.append('showStatus', row.showStatus);
+        updateShowStatus(data).then(response => {
           this.$message({
             message: '修改成功',
             type: 'success',
@@ -180,13 +205,10 @@
         });
       },
       handleShowNextLevel(index, row) {
-        this.$router.push({path: '/pms/productCate', query: {parentId: row.id}})
-      },
-      handleTransferProduct(index, row) {
-        console.log('handleAddProductCate');
+        this.$router.push({path: '/pms/productCate', query: {parentId: row.cataId}})
       },
       handleUpdate(index, row) {
-        this.$router.push({path:'/pms/updateProductCate',query:{id:row.id}});
+        this.$router.push({path: '/pms/updateProductCate', query: {id: row.cataId}});
       },
       handleDelete(index, row) {
         this.$confirm('是否要删除该品牌', '提示', {
@@ -207,14 +229,16 @@
     },
     filters: {
       levelFilter(value) {
-        if (value === 0) {
+        if (value === 1) {
           return '一级';
-        } else if (value === 1) {
+        } else if (value === 2) {
           return '二级';
+        } else if (value === 3) {
+          return '三级';
         }
       },
       disableNextLevel(value) {
-        if (value === 0) {
+        if (value === 1 || value === 2) {
           return false;
         } else {
           return true;
