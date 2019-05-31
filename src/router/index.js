@@ -37,12 +37,13 @@ export const constantRouterMap = [
     redirect: '/sys/user',
     name: 'sys',
     meta: {title: '系统管理'},
-    children: [{
-      path: 'user',
-      name: 'user',
-      component: () => import('@/views/sys/user/index'),
-      meta: {title: '用户列表'}
-    },
+    children: [
+      {
+        path: 'user',
+        name: 'user',
+        component: () => import('@/views/sys/user/index'),
+        meta: {title: '用户列表'}
+      },
       {
         path: 'addUser',
         name: 'addUser',
@@ -67,7 +68,57 @@ export const constantRouterMap = [
         name: 'dept',
         component: () => import('@/views/sys/dept/treeTable'),
         meta: {title: '部门列表'}
-      }]
+      }
+    ]
+  },
+  {
+    path: '/base',
+    component: Layout,
+    redirect: '/base/brand',
+    name: 'base',
+    meta: {title: '基础信息管理'},
+    children: [
+      {
+        path: 'brand',
+        name: 'brand',
+        component: () => import('@/views/base/brand/index'),
+        meta: {title: '品牌列表'}
+      },
+      {
+        path: 'addBrand',
+        name: 'addBrand',
+        component: () => import('@/views/base/brand/add'),
+        meta: {title: '添加品牌'},
+        hidden: true
+      },
+      {
+        path: 'updateBrand',
+        name: 'updateBrand',
+        component: () => import('@/views/base/brand/update'),
+        meta: {title: '编辑品牌'},
+        hidden: true
+      },
+      {
+        path: 'productCate',
+        name: 'productCate',
+        component: () => import('@/views/base/category/index'),
+        meta: {title: '类目列表'}
+      },
+      {
+        path: 'addProductCate',
+        name: 'addProductCate',
+        component: () => import('@/views/base/category/add'),
+        meta: {title: '添加分类'},
+        hidden: true
+      },
+      {
+        path: 'updateProductCate',
+        name: 'updateProductCate',
+        component: () => import('@/views/base/category/update'),
+        meta: {title: '修改分类'},
+        hidden: true
+      },
+    ]
   },
   {
     path: '/pms',
@@ -109,26 +160,6 @@ export const constantRouterMap = [
         hidden: true
       },
       {
-        path: 'productCate',
-        name: 'productCate',
-        component: () => import('@/views/pms/productCate/index'),
-        meta: {title: '商品分类'}
-      },
-      {
-        path: 'addProductCate',
-        name: 'addProductCate',
-        component: () => import('@/views/pms/productCate/add'),
-        meta: {title: '添加商品分类'},
-        hidden: true
-      },
-      {
-        path: 'updateProductCate',
-        name: 'updateProductCate',
-        component: () => import('@/views/pms/productCate/update'),
-        meta: {title: '修改商品分类'},
-        hidden: true
-      },
-      {
         path: 'productAttr',
         name: 'productAttr',
         component: () => import('@/views/pms/productAttr/index'),
@@ -153,26 +184,6 @@ export const constantRouterMap = [
         name: 'updateProductAttr',
         component: () => import('@/views/pms/productAttr/updateProductAttr'),
         meta: {title: '修改商品属性'},
-        hidden: true
-      },
-      {
-        path: 'brand',
-        name: 'brand',
-        component: () => import('@/views/pms/brand/index'),
-        meta: {title: '品牌管理'}
-      },
-      {
-        path: 'addBrand',
-        name: 'addBrand',
-        component: () => import('@/views/pms/brand/add'),
-        meta: {title: '添加品牌'},
-        hidden: true
-      },
-      {
-        path: 'updateBrand',
-        name: 'updateBrand',
-        component: () => import('@/views/pms/brand/update'),
-        meta: {title: '编辑品牌'},
         hidden: true
       }
     ]

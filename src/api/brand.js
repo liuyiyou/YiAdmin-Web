@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function fetchList(data) {
   return request({
-    url: '/api/base/brand/list',
+    url: '/api/base/admin/brand/list',
     method: 'post',
     data
   })
@@ -11,7 +11,7 @@ export function fetchList(data) {
 
 export function createBrand(data) {
   return request({
-    url: '/api/base/brand/create',
+    url: '/api/base/admin/brand/create',
     method: 'post',
     data: data
   })

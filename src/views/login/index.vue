@@ -94,10 +94,9 @@
         this.$refs.loginForm.validate(valid => {
           if (valid) {
             this.loading = true;
-            console.log("登陆成功.....")
-            //登录成功之后重定向到首页
             this.$store.dispatch('Login', this.loginForm).then(() => {
               this.loading = false;
+              console.log("登陆成功.....")
               this.$router.push({path: '/'})
             }).catch(() => {
               this.loading = false
